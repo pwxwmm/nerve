@@ -1,0 +1,46 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+agent/nerve-agent
+server/nerve-center
+
+# Test binaries
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Config
+*.local.yaml
+*.local.yml
+
+# Build artifacts
+dist/
+build/
+
+# Database credentials (never commit!)
+**/config/*.secret.yaml
+**/config/*.production.yaml

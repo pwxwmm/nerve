@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'nerve'
+
+scrape_configs:
+  # Nerve Server metrics
+  - job_name: 'nerve-server'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'nerve-server'
+          component: 'server'
+
+  # Nerve Agents (if exposed directly)
+  - job_name: 'nerve-agents'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['agent1:9091', 'agent2:9091']
+        labels:
+          service: 'nerve-agent'
+          component: 'agent'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+rule_files:
+  - 'alerts.yml'
+
+# Optional: Service discovery for agents
+# consul_sd_configs:
+#   - server: 'consul:8500'
+#     services: ['nerve-agent']
+

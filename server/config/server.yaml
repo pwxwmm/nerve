@@ -1,0 +1,69 @@
+# Nerve Center Server Configuration
+# Author: mmwei3 (2025-10-28)
+# Wethers: cloudWays
+
+# Server
+server:
+  addr: ":8090"
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+  
+# Authentication
+auth:
+  method: token  # token, jwt, tls
+  token_secret: "change-this-secret"
+  
+# Storage
+storage:
+  type: mongodb  # memory, mongodb, postgres, redis
+  
+  # MongoDB Configuration
+  mongodb:
+    uri: "mongodb://root:c2B2h15D1PfHTOEjZd@172.29.228.139/nerve?authSource=admin"
+    database: "nerve"
+    timeout: 30s
+    
+  # Redis Configuration (for cache)
+  redis:
+    host: "172.29.228.139"
+    port: 6379
+    password: "c2B2h15D1PfHTOEjZd"
+    database: 0
+    timeout: 10s
+    
+  # PostgreSQL Configuration (for archive, optional)
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "nerve"
+    user: "nerve"
+    password: ""
+  
+# Agent registry
+registry:
+  cleanup_interval: 1m
+  offline_threshold: 5m
+  max_agents: 10000
+  
+# Scheduler
+scheduler:
+  max_concurrent_tasks: 100
+  task_timeout: 300s
+  
+# Logging
+log:
+  level: info
+  output: stderr
+  file: ""
+  
+# Metrics
+metrics:
+  enabled: true
+  path: "/metrics"
+  
+# Agent binary distribution
+agent:
+  binary_url: "https://your-server/downloads/nerve-agent"
+  version: "1.0.0"
+

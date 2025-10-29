@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nerve - 登录</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 背景画布：用于粒子/流星等特效，完全不可交互 */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; /* 低于登录容器 (z-index:10) */
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 60%),
+                radial-gradient(circle at 60% 70%, rgba(255, 200, 100, 0.2) 0%, transparent 50%);
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-30px) rotate(2deg) scale(1.05); }
+            50% { transform: translateY(20px) rotate(-1deg) scale(0.95); }
+            75% { transform: translateY(-10px) rotate(1deg) scale(1.02); }
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 550px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.3);
+            padding: 3rem 3.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 移除顶部装饰条，避免出现蓝色细线 */
+        .login-card::before {
+            content: none;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: 0 16px 40px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .login-logo::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 26px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(8px);
+        }
+
+        .login-logo i {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            opacity: 0.9;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.01em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.25rem 1.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(102, 126, 234, 0.15);
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: #a0aec0;
+            font-weight: 400;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .input-icon:focus-within i {
+            color: #667eea;
+        }
+
+        .input-icon input {
+            padding-left: 3.5rem;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1rem;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .login-button:hover::before {
+            left: 100%;
+        }
+
+        .login-button:active {
+            transform: translateY(-1px);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid #fecaca;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1);
+            font-weight: 500;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 2rem;
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .copyright {
+            margin-bottom: 0.8rem;
+        }
+
+        .copyright p {
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .copyright strong {
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #718096;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            background: rgba(102, 126, 234, 0.1);
+            text-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+        }
+
+        .separator {
+            color: #a0aec0;
+            font-size: 0.8rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+            
+            .login-card {
+                padding: 3rem 2rem;
+            }
+            
+            .login-title {
+                font-size: 2rem;
+            }
+            
+            .login-logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .login-logo i {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* 动画效果 */
+        .login-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h1 class="login-title">Nerve</h1>
+                <p class="login-subtitle">基础设施智能管理平台</p>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="请输入用户名"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="请输入密码"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button" id="loginButton">
+                    <span id="buttonText">登录</span>
+                    <span id="buttonLoading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div class="footer-info">
+                <div class="copyright">
+                    <p>&copy; 2025 <strong>Nerve</strong> - 基础设施智能管理平台</p>
+                    <p>版权所有 <strong>mmwei3</strong> | <strong>智算运营部</strong></p>
+                </div>
+                <div class="footer-links">
+                    <a href="#" onclick="showAbout()">关于系统</a>
+                    <span class="separator">|</span>
+                    <a href="#" onclick="showPrivacy()">隐私政策</a>
+                    <span class="separator">|</span>
+                    <a href="#" onclick="showTerms()">使用条款</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 轻量背景动画：粒子 + 偶发流星
+        (function () {
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas || prefersReduced) return;
+
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            const DPR = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = width * DPR; canvas.height = height * DPR; ctx.scale(DPR, DPR);
+
+            const particleCount = Math.min(40, Math.floor((width * height) / 60000));
+            const particles = [];
+
+            function rand(min, max) { return Math.random() * (max - min) + min; }
+
+            function spawnParticle() {
+                return {
+                    x: rand(0, width),
+                    y: rand(0, height),
+                    r: rand(0.6, 1.8),
+                    vx: rand(-0.05, 0.05),
+                    vy: rand(-0.05, 0.05),
+                    a: rand(0.3, 0.9)
+                };
+            }
+
+            for (let i = 0; i < particleCount; i++) particles.push(spawnParticle());
+
+            let meteors = [];
+            function spawnMeteor() {
+                // 随机从左/右进入，起始纵坐标更随机
+                const fromLeft = Math.random() < 0.5;
+                const startX = fromLeft ? -50 : width + 50;
+                const startY = rand(-height * 0.1, height * 0.9);
+                const speedX = rand(2.2, 3.2);
+                const speedY = rand(0.8, 1.4);
+                meteors.push({
+                    x: startX,
+                    y: startY,
+                    vx: fromLeft ? speedX : -speedX,
+                    vy: speedY,
+                    life: 0,
+                    maxLife: rand(120, 180) // 更长寿命
+                });
+            }
+
+            function spawnMeteorShower() {
+                // 一次生成3-5条流星
+                const count = Math.floor(rand(3, 6));
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        spawnMeteor();
+                    }, i * 200); // 每条流星间隔200ms出现
+                }
+            }
+
+            let lastMeteorAt = 0;
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+
+                // 粒子
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                for (const p of particles) {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = width; if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height; if (p.y > height) p.y = 0;
+                    ctx.globalAlpha = p.a;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+                }
+
+                // 连接近邻粒子，形成细腻线条
+                ctx.lineWidth = 0.6; ctx.globalAlpha = 0.25; ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const a = particles[i], b = particles[j];
+                        const dx = a.x - b.x, dy = a.y - b.y;
+                        const dist2 = dx * dx + dy * dy;
+                        if (dist2 < 130 * 130) {
+                            ctx.globalAlpha = 0.15 * (1 - dist2 / (130 * 130));
+                            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+                        }
+                    }
+                }
+
+                // 流星雨
+                if (performance.now() - lastMeteorAt > 4000 && Math.random() < 0.3 && meteors.length < 1) {
+                    lastMeteorAt = performance.now();
+                    spawnMeteorShower();
+                }
+                for (let i = meteors.length - 1; i >= 0; i--) {
+                    const m = meteors[i];
+                    m.x += m.vx; m.y += m.vy; m.life++;
+                    const tail = 180; // 更长尾迹
+                    const angle = Math.atan2(m.vy, m.vx);
+                    const tx = m.x - tail * Math.cos(angle);
+                    const ty = m.y - tail * Math.sin(angle);
+                    const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+                    grad.addColorStop(0, 'rgba(255,255,255,0.95)');
+                    grad.addColorStop(0.3, 'rgba(255,255,255,0.7)');
+                    grad.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.strokeStyle = grad; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.9;
+                    ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tx, ty); ctx.stroke();
+                    if (m.life > m.maxLife || m.x > width + 120 || m.x < -120 || m.y > height + 120) meteors.splice(i, 1);
+                }
+
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(draw);
+            }
+
+            let rafId = requestAnimationFrame(draw);
+
+            function resize() {
+                width = window.innerWidth; height = window.innerHeight;
+                canvas.width = width * DPR; canvas.height = height * DPR; ctx.scale(DPR, DPR);
+            }
+            window.addEventListener('resize', resize);
+
+            // 标签不可见时暂停渲染以节能
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) cancelAnimationFrame(rafId);
+                else rafId = requestAnimationFrame(draw);
+            });
+        })();
+        // 登录表单处理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonLoading = document.getElementById('buttonLoading');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // 隐藏之前的消息
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // 显示加载状态
+            loginButton.disabled = true;
+            buttonText.style.display = 'none';
+            buttonLoading.style.display = 'inline-block';
+            
+            // 模拟登录验证（实际项目中应该调用后端API）
+            setTimeout(() => {
+                if (username === 'admin' && password === 'admin') {
+                    // 登录成功
+                    successMessage.textContent = '登录成功！正在跳转...';
+                    successMessage.style.display = 'block';
+                    
+                    // 保存登录状态
+                    localStorage.setItem('nerve_logged_in', 'true');
+                    localStorage.setItem('nerve_username', username);
+                    
+                    // 跳转到主页面
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    // 登录失败
+                    errorMessage.textContent = '用户名或密码错误，请重试';
+                    errorMessage.style.display = 'block';
+                    
+                    // 恢复按钮状态
+                    loginButton.disabled = false;
+                    buttonText.style.display = 'inline';
+                    buttonLoading.style.display = 'none';
+                }
+            }, 1500);
+        });
+
+        // 检查是否已经登录
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('nerve_logged_in');
+            if (isLoggedIn === 'true') {
+                // 如果已经登录，直接跳转到主页面
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 显示关于信息
+        function showAbout() {
+            alert('Nerve - 基础设施智能管理平台\n\n版本: 1.0.0\n作者: mmwei3 (2025-10-28)\n组织: 智算运营部\n\n这是一个现代化的基础设施管理平台，提供Agent生命周期的管理、任务调度、监控告警等功能。');
+        }
+
+        // 显示隐私政策
+        function showPrivacy() {
+            alert('隐私政策\n\n我们重视您的隐私保护。\n\n• 登录信息仅用于身份验证\n• 系统信息用于基础设施管理\n• 不会收集个人敏感信息\n• 数据加密传输和存储\n\n如有疑问，请联系管理员。');
+        }
+
+        // 显示使用条款
+        function showTerms() {
+            alert('使用条款\n\n使用本系统即表示您同意以下条款：\n\n• 仅限授权用户使用\n• 不得进行恶意操作\n• 遵守相关法律法规\n• 保护系统安全\n• 及时报告异常情况\n\n违规使用将承担相应责任。');
+        }
+
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+
+        // 回车键登录
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

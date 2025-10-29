@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nerve - 基础设施智能管理平台</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-group-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 1rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-left-color: #667eea;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* 顶部栏 */
+        .topbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .breadcrumb-item {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item:hover {
+            color: #667eea;
+        }
+
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: #ccc;
+        }
+
+        .breadcrumb-current {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            width: 250px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            min-width: 150px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #555;
+            text-decoration: none;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .user-dropdown-item i {
+            margin-right: 0.5rem;
+            width: 16px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* 内容区域 */
+        .content {
+            padding: 2rem;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-title {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stat-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .stat-card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-change {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-card-change.positive {
+            color: #10b981;
+        }
+
+        .stat-card-change.negative {
+            color: #ef4444;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.85rem 1.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.4);
+        }
+
+        /* 数据表格 */
+        .data-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .data-section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-section-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f9fafb;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-size: 1.2rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+            font-size: 1rem;
+            color: #666;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                left: 0;
+            }
+        }
+
+        /* Agent注册弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        /* Agent列表样式 */
+        .agent-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .agent-item:hover {
+            background: #f9fafb;
+        }
+
+        .agent-item:last-child {
+            border-bottom: none;
+        }
+
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-details {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+
+        .status-online .status-indicator {
+            background: #10b981;
+        }
+
+        .status-offline .status-indicator {
+            background: #ef4444;
+        }
+
+        .status-maintenance .status-indicator {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-brain"></i> Nerve</h1>
+                <p>基础设施智能管理平台</p>
+            </div>
+            
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <div class="nav-group-title">概览</div>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        仪表板
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        监控中心
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-bell"></i>
+                        告警中心
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-group-title">管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-server"></i>
+                        Agent 管理
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        任务管理
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-layer-group"></i>
+                        集群管理
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-plug"></i>
+                        插件管理
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-group-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        系统设置
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        安全中心
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-download"></i>
+                        二进制管理
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        审计日志
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-group-title">帮助</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-question-circle"></i>
+                        帮助文档
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        关于系统
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="topbar">
+                <div class="breadcrumb">
+                    <a href="#" class="breadcrumb-item">首页</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">仪表板</span>
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="搜索 Agent、任务、集群...">
+                    </div>
+                    
+                    <div class="user-menu" onclick="toggleUserMenu()">
+                        <div class="user-avatar">A</div>
+                        <span>管理员</span>
+                        <i class="fas fa-chevron-down"></i>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="#" class="user-dropdown-item" onclick="showProfile()">
+                                <i class="fas fa-user"></i>
+                                个人资料
+                            </a>
+                            <a href="#" class="user-dropdown-item" onclick="showSettings()">
+                                <i class="fas fa-cog"></i>
+                                系统设置
+                            </a>
+                            <div style="border-top: 1px solid #e5e7eb; margin: 0.5rem 0;"></div>
+                            <a href="#" class="user-dropdown-item" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                退出登录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <div class="content">
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">总 Agent 数量</div>
+                            <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-server"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="totalAgents">0</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0 今日</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">在线 Agent</div>
+                            <div class="stat-card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="onlineAgents">0</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>100% 在线率</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">离线 Agent</div>
+                            <div class="stat-card-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="offlineAgents">0</div>
+                        <div class="stat-card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>需要关注</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">总任务数</div>
+                            <div class="stat-card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="totalTasks">0</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0 今日</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        刷新数据
+                    </button>
+                    <button class="btn btn-success" onclick="createTask()">
+                        <i class="fas fa-plus"></i>
+                        创建任务
+                    </button>
+                    <button class="btn btn-warning" onclick="managePlugins()">
+                        <i class="fas fa-plug"></i>
+                        插件管理
+                    </button>
+                    <button class="btn btn-secondary" onclick="manageClusters()">
+                        <i class="fas fa-layer-group"></i>
+                        集群管理
+                    </button>
+                </div>
+
+                <!-- Agent 列表 -->
+                <div class="data-section">
+                    <div class="data-section-header">
+                        <h2 class="data-section-title">Agent 列表</h2>
+                        <div class="data-section-actions">
+                            <button class="btn btn-primary" onclick="openAgentModal()">
+                                <i class="fas fa-plus"></i>
+                                添加 Agent
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 搜索和筛选栏 -->
+                    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <input type="text" id="agentSearch" class="form-input" placeholder="搜索主机名、IP、CPU类型..." style="width: 100%;" oninput="filterAgents()">
+                            </div>
+                            <div>
+                                <select id="agentStatusFilter" class="form-input form-select" style="min-width: 120px;" onchange="filterAgents()">
+                                    <option value="">全部状态</option>
+                                    <option value="online">在线</option>
+                                    <option value="offline">离线</option>
+                                    <option value="maintenance">维护中</option>
+                                    <option value="error">错误</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select id="agentOSFilter" class="form-input form-select" style="min-width: 150px;" onchange="filterAgents()">
+                                    <option value="">全部系统</option>
+                                    <option value="Ubuntu">Ubuntu</option>
+                                    <option value="CentOS">CentOS</option>
+                                    <option value="Debian">Debian</option>
+                                    <option value="RedHat">RedHat</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" onclick="clearFilters()" style="padding: 0.75rem 1rem;">
+                                <i class="fas fa-times"></i>
+                                清除
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Agent表格 -->
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="agentTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>状态</th>
+                                    <th>主机名</th>
+                                    <th>IP地址</th>
+                                    <th>CPU类型</th>
+                                    <th>CPU核心</th>
+                                    <th>内存</th>
+                                    <th>操作系统</th>
+                                    <th>GPU信息</th>
+                                    <th>最后在线</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentTableBody">
+                                <!-- Agent数据将在这里动态加载 -->
+                            </tbody>
+                        </table>
+                        <div id="agentList">
+                            <!-- 空状态或卡片视图 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            © 2025 mmwei3 (2025-10-28) | 智算运营部 | Nerve - 基础设施智能管理平台
+        </footer>
+    </div>
+
+    <!-- Agent注册弹窗 -->
+    <div class="modal-overlay" id="agentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">添加 Agent</h2>
+                <button class="modal-close" onclick="closeAgentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- 一键安装 -->
+            <div class="form-group">
+                <label class="form-label" for="agentToken">鉴权 Token *</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="agentToken" class="form-input" placeholder="点击生成新Token或粘贴现有Token" required style="flex: 1;">
+                    <button type="button" class="btn btn-success" onclick="generateNewToken()" style="padding: 0.75rem 1rem;">
+                        <i class="fas fa-key"></i>
+                        生成
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="copyToken()" style="padding: 0.75rem 1rem;">
+                        <i class="fas fa-copy"></i>
+                        复制
+                    </button>
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">
+                    <i class="fas fa-info-circle"></i>
+                    点击"生成"创建新的安装Token，或使用现有Token
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Server 地址</label>
+                <input type="text" id="agentServerUrl" class="form-input" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">在目标机器上执行</label>
+                <textarea id="installCmd" class="form-input form-textarea" style="min-height: 140px; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;" readonly></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeAgentModal()">关闭</button>
+                <button type="button" class="btn btn-secondary" onclick="copyInstallCmd()">
+                    <i class="fas fa-copy"></i>
+                    复制命令
+                </button>
+            </div>
+
+            <!-- 高级选项：手动注册（可折叠） -->
+            <details style="margin-top: 1rem;">
+                <summary style="cursor: pointer; color: #667eea;">高级选项：手动注册</summary>
+                <form id="agentForm" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="agentHostname">主机名 *</label>
+                        <input type="text" id="agentHostname" name="hostname" class="form-input" placeholder="请输入主机名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentCPUType">CPU 类型</label>
+                        <input type="text" id="agentCPUType" name="cpu_type" class="form-input" placeholder="如: Intel Xeon E5-2680">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentCPULogic">CPU 逻辑核心数</label>
+                        <input type="number" id="agentCPULogic" name="cpu_logic" class="form-input" placeholder="如: 16" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentMemory">内存大小</label>
+                        <input type="text" id="agentMemory" name="memory" class="form-input" placeholder="如: 32GB">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentOS">操作系统</label>
+                        <input type="text" id="agentOS" name="os" class="form-input" placeholder="如: Ubuntu 20.04">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentSN">序列号</label>
+                        <input type="text" id="agentSN" name="sn" class="form-input" placeholder="设备序列号">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentBrand">品牌</label>
+                        <input type="text" id="agentBrand" name="brand" class="form-input" placeholder="如: Dell">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentProduct">产品型号</label>
+                        <input type="text" id="agentProduct" name="product" class="form-input" placeholder="如: PowerEdge R740">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentGPUType">GPU 类型</label>
+                        <input type="text" id="agentGPUType" name="gpu_type" class="form-input" placeholder="如: NVIDIA Tesla V100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentGPUNum">GPU 数量</label>
+                        <input type="number" id="agentGPUNum" name="gpu_num" class="form-input" placeholder="如: 2" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentManageIP">管理IP</label>
+                        <input type="text" id="agentManageIP" name="manageip" class="form-input" placeholder="如: 192.168.1.100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="agentDescription">描述</label>
+                        <textarea id="agentDescription" name="description" class="form-input form-textarea" placeholder="Agent 描述信息"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-cancel" onclick="closeAgentModal()">取消</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            手动注册
+                        </button>
+                    </div>
+                </form>
+            </details>
+        </div>
+    </div>
+
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('nerve_logged_in');
+            if (isLoggedIn !== 'true') {
+                // 如果未登录，跳转到登录页面
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('nerve_logged_in');
+            localStorage.removeItem('nerve_username');
+            window.location.href = 'login.html';
+        }
+
+        // 更新用户信息显示
+        function updateUserInfo() {
+            const username = localStorage.getItem('nerve_username') || 'admin';
+            const userAvatar = document.querySelector('.user-avatar');
+            const userMenu = document.querySelector('.user-menu span');
+            
+            if (userAvatar) {
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            }
+            if (userMenu) {
+                userMenu.textContent = username;
+            }
+        }
+
+        // 模拟数据加载
+        function loadData() {
+            // 加载Agent列表
+            loadAgents();
+            // 更新统计数据
+            updateStats();
+        }
+
+        // 全局变量存储Agent数据
+        let allAgents = [];
+        let filteredAgents = [];
+
+        // 加载Agent列表
+        async function loadAgents() {
+            try {
+                const response = await fetch('/api/agents');
+                const data = await response.json();
+                
+                if (data.agents && data.agents.length > 0) {
+                    allAgents = data.agents;
+                    filteredAgents = [...allAgents];
+                    renderAgentTable(filteredAgents);
+                } else {
+                    renderEmptyState();
+                }
+            } catch (error) {
+                console.error('加载Agent列表失败:', error);
+                renderEmptyState();
+            }
+        }
+
+        // 渲染Agent表格
+        function renderAgentTable(agents) {
+            const agentTable = document.getElementById('agentTable');
+            const agentTableBody = document.getElementById('agentTableBody');
+            const agentList = document.getElementById('agentList');
+            
+            if (agents.length === 0) {
+                agentTable.style.display = 'none';
+                agentList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-server"></i>
+                        <h3>没有找到匹配的 Agent</h3>
+                        <p>请尝试调整搜索条件</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 显示表格，隐藏空状态
+            agentTable.style.display = 'table';
+            agentList.innerHTML = '';
+            
+            agentTableBody.innerHTML = agents.map(agent => {
+                const statusBadge = getStatusBadge(agent.status || 'offline');
+                const manageIP = agent.manageip || agent.manage_ip || '未知';
+                const cpuType = agent.cpu_type || '未知';
+                const cpuLogic = agent.cpu_logic || agent.cpu_cores || '未知';
+                const memory = agent.memory || '未知';
+                const os = agent.os || agent.operating_system || '未知';
+                const gpuInfo = agent.gpu_num > 0 ? `${agent.gpu_num} x ${agent.gpu_type || 'GPU'}` : '无';
+                
+                return `
+                    <tr>
+                        <td>${statusBadge}</td>
+                        <td><strong>${agent.hostname || agent.id}</strong></td>
+                        <td>${manageIP}</td>
+                        <td>${cpuType}</td>
+                        <td>${cpuLogic}</td>
+                        <td>${memory}</td>
+                        <td>${os}</td>
+                        <td>${gpuInfo}</td>
+                        <td>${formatTime(agent.last_seen)}</td>
+                        <td>
+                            <div class="agent-actions">
+                                <button class="btn btn-sm btn-secondary" onclick="viewAgent('${agent.id}')" title="查看详情">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="restartAgent('${agent.id}')" title="重启">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="deleteAgent('${agent.id}')" title="删除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 获取状态徽章
+        function getStatusBadge(status) {
+            const badges = {
+                'online': '<span class="status-badge status-online"><span class="status-indicator"></span> 在线</span>',
+                'offline': '<span class="status-badge status-offline"><span class="status-indicator"></span> 离线</span>',
+                'maintenance': '<span class="status-badge status-pending"><span class="status-indicator"></span> 维护中</span>',
+                'error': '<span class="status-badge" style="background: #fee2e2; color: #991b1b;"><span class="status-indicator" style="background: #ef4444;"></span> 错误</span>'
+            };
+            return badges[status] || badges['offline'];
+        }
+
+        // 搜索和筛选Agent
+        function filterAgents() {
+            const searchText = document.getElementById('agentSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('agentStatusFilter').value;
+            const osFilter = document.getElementById('agentOSFilter').value;
+            
+            filteredAgents = allAgents.filter(agent => {
+                // 搜索条件
+                const matchesSearch = !searchText || 
+                    (agent.hostname || '').toLowerCase().includes(searchText) ||
+                    (agent.manageip || agent.manage_ip || '').includes(searchText) ||
+                    (agent.cpu_type || '').toLowerCase().includes(searchText) ||
+                    (agent.id || '').toLowerCase().includes(searchText);
+                
+                // 状态筛选
+                const matchesStatus = !statusFilter || (agent.status || 'offline') === statusFilter;
+                
+                // 操作系统筛选
+                const matchesOS = !osFilter || (agent.os || agent.operating_system || '').includes(osFilter);
+                
+                return matchesSearch && matchesStatus && matchesOS;
+            });
+            
+            renderAgentTable(filteredAgents);
+        }
+
+        // 清除筛选条件
+        function clearFilters() {
+            document.getElementById('agentSearch').value = '';
+            document.getElementById('agentStatusFilter').value = '';
+            document.getElementById('agentOSFilter').value = '';
+            filteredAgents = [...allAgents];
+            renderAgentTable(filteredAgents);
+        }
+
+        // 渲染空状态
+        function renderEmptyState() {
+            const agentList = document.getElementById('agentList');
+            agentList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-server"></i>
+                    <h3>暂无 Agent</h3>
+                    <p>还没有注册的 Agent，请先添加 Agent 或等待 Agent 自动注册</p>
+                </div>
+            `;
+        }
+
+        // 更新统计数据
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/v1/system/stats');
+                const data = await response.json();
+                
+                if (data.stats) {
+                    document.getElementById('totalAgents').textContent = data.stats.total_agents || 0;
+                    document.getElementById('onlineAgents').textContent = data.stats.online_agents || 0;
+                    document.getElementById('offlineAgents').textContent = data.stats.offline_agents || 0;
+                    document.getElementById('totalTasks').textContent = data.stats.total_tasks || 0;
+                }
+            } catch (error) {
+                console.error('更新统计数据失败:', error);
+            }
+        }
+
+        // 格式化时间
+        function formatTime(timestamp) {
+            if (!timestamp) return '未知';
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
+            return `${Math.floor(diff / 86400000)}天前`;
+        }
+
+        // Agent弹窗相关函数
+        function openAgentModal() {
+            document.getElementById('agentModal').classList.add('show');
+            initInstallCommand();
+        }
+
+        function closeAgentModal() {
+            document.getElementById('agentModal').classList.remove('show');
+            const form = document.getElementById('agentForm');
+            if (form) form.reset();
+        }
+
+        // 处理Agent表单提交
+        document.getElementById('agentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const agentData = {};
+            
+            // 收集表单数据
+            for (let [key, value] of formData.entries()) {
+                if (value.trim()) {
+                    agentData[key] = value.trim();
+                }
+            }
+            
+            try {
+                const response = await fetch('/api/agents/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('nerve_token') || 'demo-token'
+                    },
+                    body: JSON.stringify(agentData)
+                });
+                
+                if (response.ok) {
+                    alert('Agent 添加成功！');
+                    closeAgentModal();
+                    loadAgents(); // 重新加载列表
+                    updateStats(); // 更新统计
+                } else {
+                    const error = await response.json();
+                    alert('添加失败: ' + (error.error || '未知错误'));
+                }
+            } catch (error) {
+                console.error('添加Agent失败:', error);
+                alert('添加失败: ' + error.message);
+            }
+        });
+
+        // 一键安装命令生成
+        function initInstallCommand() {
+            const serverOrigin = window.location.origin; // e.g. http://localhost:8090
+            const serverUrl = serverOrigin; // keep base origin; script uses /api/install
+            const tokenInput = document.getElementById('agentToken');
+            const serverInput = document.getElementById('agentServerUrl');
+
+            serverInput.value = serverUrl;
+
+            // 尝试从localStorage获取现有token
+            const currentToken = (localStorage.getItem('nerve_token') || '').trim();
+            if (tokenInput && !tokenInput.value && currentToken) {
+                tokenInput.value = currentToken;
+            }
+
+            // 绑定输入事件
+            tokenInput.oninput = updateInstallCommand;
+            
+            // 初始渲染
+            updateInstallCommand();
+        }
+
+        function copyInstallCmd() {
+            const cmdTextarea = document.getElementById('installCmd');
+            cmdTextarea.select();
+            document.execCommand('copy');
+            alert('安装命令已复制到剪贴板');
+        }
+
+        // Token 管理功能
+        async function generateNewToken() {
+            try {
+                const response = await fetch('/api/tokens/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('nerve_token') || 'demo-token'
+                    },
+                    body: JSON.stringify({
+                        name: 'Agent安装Token_' + new Date().toISOString().slice(0, 19),
+                        expires_in: 86400 // 24小时
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('agentToken').value = data.token;
+                    updateInstallCommand();
+                    alert('新Token已生成！');
+                } else {
+                    const error = await response.json();
+                    alert('生成Token失败: ' + (error.error || '未知错误'));
+                }
+            } catch (error) {
+                console.error('生成Token失败:', error);
+                // 如果后端API不可用，生成一个临时Token用于演示
+                const tempToken = 'temp_' + Math.random().toString(36).substr(2, 16);
+                document.getElementById('agentToken').value = tempToken;
+                updateInstallCommand();
+                alert('生成临时Token（演示模式）: ' + tempToken);
+            }
+        }
+
+        function copyToken() {
+            const tokenInput = document.getElementById('agentToken');
+            if (!tokenInput.value.trim()) {
+                alert('请先生成或输入Token');
+                return;
+            }
+            
+            tokenInput.select();
+            document.execCommand('copy');
+            alert('Token已复制到剪贴板');
+        }
+
+        function updateInstallCommand() {
+            const tokenInput = document.getElementById('agentToken');
+            const cmdTextarea = document.getElementById('installCmd');
+            const serverUrl = document.getElementById('agentServerUrl').value;
+            
+            const token = (tokenInput.value || '').trim();
+            const safeToken = token || '<your_token_here>';
+            const cmd = `curl -fsSL "${serverUrl}/api/install?token=${safeToken}" | bash -s -- --token ${safeToken} --server ${serverUrl}`;
+            cmdTextarea.value = cmd;
+        }
+
+        // Agent操作函数
+        function viewAgent(agentId) {
+            alert(`查看Agent详情: ${agentId}`);
+        }
+
+        async function restartAgent(agentId) {
+            if (!confirm('确定要重启这个Agent吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/agents/${agentId}/restart`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('nerve_token') || 'demo-token'
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('重启命令已发送');
+                    loadAgents(); // 重新加载列表
+                } else {
+                    alert('重启失败');
+                }
+            } catch (error) {
+                console.error('重启Agent失败:', error);
+                alert('重启失败: ' + error.message);
+            }
+        }
+
+        async function deleteAgent(agentId) {
+            if (!confirm('确定要删除这个Agent吗？此操作不可恢复！')) return;
+            
+            try {
+                const response = await fetch(`/api/agents/${agentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('nerve_token') || 'demo-token'
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('Agent 已删除');
+                    loadAgents(); // 重新加载列表
+                    updateStats(); // 更新统计
+                } else {
+                    alert('删除失败');
+                }
+            } catch (error) {
+                console.error('删除Agent失败:', error);
+                alert('删除失败: ' + error.message);
+            }
+        }
+
+        function refreshData() {
+            const refreshBtn = event.target;
+            const icon = refreshBtn.querySelector('i');
+            icon.className = 'loading';
+            
+            setTimeout(() => {
+                icon.className = 'fas fa-sync-alt';
+                loadData();
+            }, 1000);
+        }
+
+        function createTask() {
+            alert('创建任务功能待实现');
+        }
+
+        function managePlugins() {
+            alert('插件管理功能待实现');
+        }
+
+        function manageClusters() {
+            alert('集群管理功能待实现');
+        }
+
+        // addAgent 函数已替换为 openAgentModal()
+
+        // 用户菜单功能
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function showProfile() {
+            alert('个人资料功能待实现');
+            document.getElementById('userDropdown').classList.remove('show');
+        }
+
+        function showSettings() {
+            alert('系统设置功能待实现');
+            document.getElementById('userDropdown').classList.remove('show');
+        }
+
+        // 点击其他地方关闭用户菜单
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userMenu.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // 点击弹窗外部关闭弹窗
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('agentModal');
+            if (e.target === modal) {
+                closeAgentModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAgentModal();
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查登录状态
+            if (checkLoginStatus()) {
+                // 更新用户信息
+                updateUserInfo();
+                // 加载数据
+                loadData();
+            }
+        });
+    </script>
+</body>
+</html>

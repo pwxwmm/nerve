@@ -1,0 +1,72 @@
+{
+  "dashboard": {
+    "title": "Nerve Infrastructure Monitor",
+    "description": "Nerve Infrastructure Monitoring Dashboard",
+    "author": "mmwei3 (2025-10-28), Wethers: cloudWays",
+    "tags": ["nerve", "infrastructure"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Total Agents",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "nerve_agent_total",
+            "legendFormat": "Agents"
+          }
+        ]
+      },
+      {
+        "title": "Online Agents",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "nerve_agent_online",
+            "legendFormat": "Online"
+          }
+        ]
+      },
+      {
+        "title": "Agent Online Ratio",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "nerve_agent_online / nerve_agent_total * 100",
+            "legendFormat": "Online %"
+          }
+        ]
+      },
+      {
+        "title": "Task Success Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(nerve_task_success_total[5m]) / rate(nerve_task_total[5m]) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ]
+      },
+      {
+        "title": "API Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(nerve_api_requests_total[5m])",
+            "legendFormat": "Requests/sec"
+          }
+        ]
+      },
+      {
+        "title": "Task Duration",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "rate(nerve_task_duration_seconds_bucket[5m])",
+            "legendFormat": "Duration"
+          }
+        ]
+      }
+    ]
+  }
+}
+
