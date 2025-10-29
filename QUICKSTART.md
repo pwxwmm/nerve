@@ -31,7 +31,7 @@ go mod download
 cd server && go build -o nerve-center && cd ..
 
 # 启动 Server
-./server/nerve-center --addr :8080 --debug
+./server/nerve-center --addr :8090 --debug
 ```
 
 ### 第 3 步：验证
@@ -39,7 +39,7 @@ cd server && go build -o nerve-center && cd ..
 在新终端测试：
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:8090/health
 # 应该返回: {"status":"ok"}
 ```
 
@@ -89,7 +89,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/nerve-center --addr :8080
+ExecStart=/usr/local/bin/nerve-center --addr :8090
 Restart=always
 
 [Install]
@@ -106,15 +106,15 @@ sudo systemctl enable --now nerve-center
 #### 一键安装
 
 ```bash
-curl -fsSL http://your-server:8080/install.sh | \
-  sh -s -- --token=YOUR_TOKEN --server=http://your-server:8080
+curl -fsSL http://your-server:8090/install.sh | \
+  sh -s -- --token=YOUR_TOKEN --server=http://your-server:8090
 ```
 
 #### 手动安装
 
 ```bash
 # 下载 Agent 二进制
-wget http://your-server:8080/download?token=YOUR_TOKEN \
+wget http://your-server:8090/download?token=YOUR_TOKEN \
   -O /usr/local/bin/nerve-agent
 
 chmod +x /usr/local/bin/nerve-agent
@@ -128,7 +128,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/nerve-agent \
-  --server=http://your-server:8080 \
+  --server=http://your-server:8090 \
   --token=YOUR_TOKEN
 Restart=always
 
@@ -158,7 +158,7 @@ systemctl status nerve-agent
 ### 3. 查看 Agent 信息
 
 ```bash
-curl http://localhost:8080/api/agents/list | jq
+curl http://localhost:8090/api/agents/list | jq
 ```
 
 ## 🎯 部署到多台机器
@@ -175,8 +175,8 @@ EOF
 
 # 并行安装 Agent
 parallel-ssh -h hosts.txt \
-  'curl -fsSL http://nerve-center:8080/install.sh | \
-   sh -s -- --token=YOUR_TOKEN --server=http://nerve-center:8080'
+  'curl -fsSL http://nerve-center:8090/install.sh | \
+   sh -s -- --token=YOUR_TOKEN --server=http://nerve-center:8090'
 ```
 
 ### 使用 Ansible
@@ -187,10 +187,10 @@ parallel-ssh -h hosts.txt \
   tasks:
     - name: Download and install agent
       shell: |
-        curl -fsSL http://nerve-center:8080/install.sh | \
+        curl -fsSL http://nerve-center:8090/install.sh | \
           sh -s -- \
           --token={{ nerve_token }} \
-          --server=http://nerve-center:8080
+          --server=http://nerve-center:8090
 ```
 
 ## 📊 监控和告警
@@ -198,14 +198,14 @@ parallel-ssh -h hosts.txt \
 ### 查看 Server 指标
 
 ```bash
-curl http://localhost:8080/metrics
+curl http://localhost:8090/metrics
 ```
 
 ### 设置告警规则
 
 ```bash
 # 检查离线 Agent
-curl -s http://localhost:8080/api/agents/list | \
+curl -s http://localhost:8090/api/agents/list | \
   jq '.[] | select(.status == "offline")'
 ```
 
@@ -218,7 +218,7 @@ curl -s http://localhost:8080/api/agents/list | \
 ping your-server
 
 # 2. 检查防火墙
-curl http://your-server:8080/health
+curl http://your-server:8090/health
 
 # 3. 查看 Agent 日志
 journalctl -u nerve-agent --no-pager | tail -20

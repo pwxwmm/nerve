@@ -31,7 +31,7 @@ go build -o nerve-center
 scp nerve-center user@server:/usr/local/bin/
 
 # Start server
-nerve-center --addr :8080 --debug
+nerve-center --addr :8090 --debug
 
 # Or with systemd
 cp deploy/nerve-agent.service /etc/systemd/system/
@@ -55,16 +55,16 @@ docker-compose up -d
 On any Linux machine:
 
 ```bash
-curl -fsSL https://your-server:8080/install.sh | sh -s -- \
+curl -fsSL https://your-server:8090/install.sh | sh -s -- \
   --token=YOUR_TOKEN \
-  --server=https://your-server:8080
+  --server=https://your-server:8090
 ```
 
 ### Manual Installation
 
 ```bash
 # Download agent binary
-wget https://your-server:8080/download -O /usr/local/bin/nerve-agent
+wget https://your-server:8090/download -O /usr/local/bin/nerve-agent
 chmod +x /usr/local/bin/nerve-agent
 
 # Create systemd service
@@ -75,7 +75,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/nerve-agent --server=https://your-server:8080 --token=YOUR_TOKEN
+ExecStart=/usr/local/bin/nerve-agent --server=https://your-server:8090 --token=YOUR_TOKEN
 Restart=always
 
 [Install]
@@ -95,7 +95,7 @@ Edit `/etc/nerve-agent/config.yaml`:
 
 ```yaml
 server:
-  url: "https://nerve-center:8080"
+  url: "https://nerve-center:8090"
   timeout: 30s
 
 auth:
@@ -118,7 +118,7 @@ Edit `/etc/nerve-center/server.yaml`:
 
 ```yaml
 server:
-  addr: ":8080"
+  addr: ":8090"
   
 auth:
   method: token
@@ -154,10 +154,10 @@ systemctl status nerve-agent
 journalctl -u nerve-center -f
 
 # List agents
-curl http://localhost:8080/api/agents/list
+curl http://localhost:8090/api/agents/list
 
 # Health check
-curl http://localhost:8080/health
+curl http://localhost:8090/health
 ```
 
 ## Scaling
@@ -168,9 +168,9 @@ Deploy multiple server instances with load balancer:
 
 ```nginx
 upstream nerve-backend {
-    server nerve1:8080;
-    server nerve2:8080;
-    server nerve3:8080;
+    server nerve1:8090;
+    server nerve2:8090;
+    server nerve3:8090;
 }
 
 server {
@@ -263,18 +263,18 @@ scheduler:
 ### Metrics Endpoint
 
 ```
-curl http://localhost:8080/metrics
+curl http://localhost:8090/metrics
 ```
 
 ### Agent List
 
 ```bash
-curl http://localhost:8080/api/agents/list | jq
+curl http://localhost:8090/api/agents/list | jq
 ```
 
 ### Agent Details
 
 ```bash
-curl http://localhost:8080/api/agents/:hostname | jq
+curl http://localhost:8090/api/agents/:hostname | jq
 ```
 

@@ -157,7 +157,7 @@
 go build -o nerve-center ./server
 
 # 启动 Server
-./nerve-center --addr :8080 --metrics-addr :9090 --debug
+./nerve-center --addr :8090 --metrics-addr :9090 --debug
 ```
 
 ### 2. 启动 Prometheus（可选）
@@ -168,8 +168,8 @@ docker-compose up -d
 ```
 
 访问：
-- **Nerve Server**: http://localhost:8080
-- **Web UI**: http://localhost:8080/web/
+- **Nerve Server**: http://localhost:8090
+- **Web UI**: http://localhost:8090/web/
 - **Prometheus**: http://localhost:9090
 - **Grafana**: http://localhost:3000
 
@@ -187,7 +187,7 @@ curl -fsSL "http://your-server/install.sh?token=YOUR_TOKEN&server=YOUR_SERVER" |
 curl http://localhost:9090/metrics
 
 # 系统指标
-curl http://localhost:8080/api/metrics
+curl http://localhost:8090/api/metrics
 ```
 
 ## 💡 最佳实践
@@ -201,7 +201,7 @@ curl http://localhost:8080/api/metrics
 ## 📞 支持
 
 - **作者**：mmwei3 (2025-10-28)
-- **Wethers**：cloudWays
+- **组织**：智算运营部
 - **文档**：查看 `docs/` 目录
 - **问题**：GitHub Issues
 

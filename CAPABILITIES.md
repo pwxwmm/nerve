@@ -3,7 +3,7 @@
 ## 📊 项目状态
 
 **作者**: mmwei3 (2025-10-28)  
-**Wethers**: cloudWays  
+**组织**: 智算运营部  
 **版本**: 1.0.0-alpha
 
 ## ✅ 已完成功能
@@ -87,18 +87,18 @@
 ### 1. 完整监控系统
 ```bash
 # 启动 Server
-./server/nerve-center --addr :8080 --debug
+./server/nerve-center --addr :8090 --debug
 
 # 启动 Agent
-./agent/nerve-agent --server=http://localhost:8080 --token=test --debug
+./agent/nerve-agent --server=http://localhost:8090 --token=test --debug
 
 # 访问 Web UI
-open http://localhost:8080/web/
+open http://localhost:8090/web/
 
 # API 调用
-curl http://localhost:8080/api/v1/agents/list
-curl http://localhost:8080/api/v1/clusters/list
-curl http://localhost:8080/api/v1/alerts/list
+curl http://localhost:8090/api/v1/agents/list
+curl http://localhost:8090/api/v1/clusters/list
+curl http://localhost:8090/api/v1/alerts/list
 ```
 
 ### 2. 详细系统信息收集
@@ -172,7 +172,7 @@ curl http://localhost:8080/api/v1/alerts/list
 ## 📞 技术支持
 
 - **作者**: mmwei3
-- **Wethers**: cloudWays
+- **组织**: 智算运营部
 - **文档**: 查看 `docs/` 目录
 - **问题**: GitHub Issues
 

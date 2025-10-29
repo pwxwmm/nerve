@@ -3,7 +3,7 @@
 ## 🎉 项目完成度：100%
 
 **作者**: mmwei3 (2025-10-28)  
-**Wethers**: cloudWays  
+**组织**: 智算运营部  
 **版本**: 1.0.0
 
 ## ✅ 已完成的所有核心功能
@@ -64,7 +64,7 @@
 ```bash
 go mod download
 cd server && go build -o nerve-center && cd ..
-./server/nerve-center --addr :8080 --metrics-addr :9090 --debug
+./server/nerve-center --addr :8090 --metrics-addr :9090 --debug
 ```
 
 ### 3. 启动 Prometheus（可选）
@@ -74,8 +74,8 @@ docker-compose up -d
 ```
 
 ### 4. 访问服务
-- **Nerve Server**: http://localhost:8080
-- **Web UI**: http://localhost:8080/web/
+- **Nerve Server**: http://localhost:8090
+- **Web UI**: http://localhost:8090/web/
 - **Prometheus**: http://localhost:9090
 - **Grafana**: http://localhost:3000
 

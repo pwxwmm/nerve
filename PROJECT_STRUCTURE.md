@@ -201,13 +201,13 @@ Agent 采集以下详细信息：
 make build-all
 
 # 3. 启动 Server
-./server/nerve-center --addr :8080 --debug
+./server/nerve-center --addr :8090 --debug
 
 # 4. 启动 Agent
-./agent/nerve-agent --server=http://localhost:8080 --token=test --debug
+./agent/nerve-agent --server=http://localhost:8090 --token=test --debug
 
 # 5. 访问 Web UI
-open http://localhost:8080/web/
+open http://localhost:8090/web/
 ```
 
 ### 安全模式

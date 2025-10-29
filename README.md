@@ -7,7 +7,7 @@ A lightweight, production-ready agent system for large-scale infrastructure moni
 ## 👥 Authors
 
 - **mmwei3** (2025-10-28)
-- **Wethers**: cloudWays
+- **组织**: 智算运营部
 
 ## 🎯 Features
 

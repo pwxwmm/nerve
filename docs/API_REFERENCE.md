@@ -5,7 +5,7 @@
 Nerve Center 提供 RESTful API 接口用于管理 Agent、任务、集群和系统。
 
 **作者**: mmwei3 (2025-10-28)  
-**组织**: Wethers: cloudWays
+**组织**: 智算运营部
 
 ## 基础信息
 
