@@ -3,6 +3,9 @@
 <img width="2528" height="1218" alt="image" src="https://github.com/user-attachments/assets/de26400d-af57-4d8b-b947-9ea00aa9c7b8" />
 <img width="2345" height="1205" alt="image" src="https://github.com/user-attachments/assets/c5bc4146-348c-4786-9974-468b2b167592" />
 <img width="2321" height="988" alt="image" src="https://github.com/user-attachments/assets/bc39ee8d-bf0b-4f06-8d46-89dd5e80a0bc" />
+<img width="2206" height="1311" alt="image" src="https://github.com/user-attachments/assets/225aab47-c2cc-47ed-8188-f649f4b28414" />
+
+<img width="2199" height="783" alt="image" src="https://github.com/user-attachments/assets/d5433eff-b44b-482d-a8e4-6003c76f01e9" />
 
 **Nerve** — the distributed intelligence beneath your infrastructure.
 
@@ -129,6 +132,7 @@ nerve/
 
 详细结构请查看 [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
 
+
 ## 📚 Documentation
 
 - [快速开始](QUICKSTART.md) - Getting started guide
@@ -137,6 +141,7 @@ nerve/
 - [API 文档](docs/API.md) - API documentation
 - [部署指南](docs/DEPLOYMENT.md) - Deployment guide
 - [Hook 插件](docs/HOOK_PLUGIN.md) - Plugin system
+- [Blog] (https://mmwei.blog.csdn.net/article/details/154080948?fromshare=blogdetail&sharetype=blogdetail&sharerId=154080948&sharerefer=PC&sharesource=qq_28513801&sharefrom=from_link) - blog
 
 ## 🌟 Roadmap
 
