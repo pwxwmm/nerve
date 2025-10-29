@@ -1,4 +1,8 @@
 # Nerve - Distributed Infrastructure Intelligence Platform
+<img width="2532" height="1237" alt="image" src="https://github.com/user-attachments/assets/76758ad0-552d-49ac-a2d8-d3c338eb9899" />
+<img width="2528" height="1218" alt="image" src="https://github.com/user-attachments/assets/de26400d-af57-4d8b-b947-9ea00aa9c7b8" />
+<img width="2345" height="1205" alt="image" src="https://github.com/user-attachments/assets/c5bc4146-348c-4786-9974-468b2b167592" />
+<img width="2321" height="988" alt="image" src="https://github.com/user-attachments/assets/bc39ee8d-bf0b-4f06-8d46-89dd5e80a0bc" />
 
 **Nerve** — the distributed intelligence beneath your infrastructure.
 
